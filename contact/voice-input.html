@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
+		<link rel="stylesheet" href="build/conversational-form-docs.min.css">
+
+		<!-- <script id="conversational-form-development" src="../dist/conversational-form.min.js"></script>
+		<link rel="stylesheet" href="../dist/conversational-form.min.css"> -->
+		<script type="text/javascript" src="https://cf-4053.kxcdn.com/conversational-form/0.9.6/conversational-form.min.js" crossorigin></script>
+	</head>
+	<body>
+		<style>
+			.custom-template{
+				font-size:12px;
+				color:red;
+			}
+		</style>
+
+		<main class="content">
+			<menu id="small-screen-menu">
+				<h2>Conversational Form examples</h2>
+
+				<div class="switch-btn">
+					<label class="switch">
+						<input type="checkbox" onclick="window.conversationalFormExamples.toggleConversation(event)">
+						<div class="slider round"></div>
+					</label>
+				</div>
+
+				<div class="hamburger-btn" onclick="window.conversationalFormExamples.toggleMenuState(event)">
+				<svg viewBox="0 0 29 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+					<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square">
+						<g transform="translate(-325.000000, -87.000000)" stroke="#FFFFFF" stroke-width="2">
+							<g transform="translate(325.000000, 87.000000)">
+								<path d="M27.4802431,7 L1.23827993,7"></path>
+								<path d="M27.4802431,1 L1.23827993,1"></path>
+								<path d="M27.4802431,13 L1.23827993,13"></path>
+							</g>
+						</g>
+					</g>
+				</svg>
+			</div>
+			</menu>
+
+			<div class="switch-btn" id="cf-toggle-btn" data-label="Enable Conversational Form" data-label-toggled="Disable Conversational Form">
+				<label class="switch">
+					<input type="checkbox" onclick="window.conversationalFormExamples.toggleConversation(event)">
+					<div class="slider round"></div>
+				</label>
+			</div>
+
+			<section id="info" role="info">
+				<div class="close-btn" onclick="window.conversationalFormExamples.toggleMenuState()">
+					<svg viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+						<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="square">
+							<g transform="translate(-328.000000, -83.000000)" stroke="#FFFFFF" stroke-width="2">
+								<g id="close" transform="translate(329.000000, 84.000000)">
+									<path d="M19.6371966,19.2779351 L1.08132646,0.722064927"></path>
+									<path d="M19.4923318,0.722064927 L0.936461672,19.2779351"></path>
+								</g>
+							</g>
+						</g>
+					</svg>
+				</div>
+
+				<article>
+					<h1 id="writer">
+						Voice Control (1/2)
+					</h1>
+					<h2>
+						Fill out a form using your voice. This example uses HTML5s <a href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition" target="_blank">SpeechRecognition</a> API to have <u>speech 2 text</u>.
+						</br></br>
+						Read WIKI <a href="https://github.com/space10-community/conversational-form/wiki/Conditional-Flow" target="_blank">here</a>
+						</br></br>
+						See an example where we also include <a href="voice-input-output.html" target="_self">text 2 speech here</a>
+					</h2>
+				</article>
+			</section>
+
+			<section role="form">
+				<div class="form-outer">
+
+					<!-- Conversational Form will auto-run because of attribute "cf-form" -->
+					<form id="form">
+						<input
+							id="123"
+							name="123"
+							type="text"
+							cf-questions="Hello, please tell me your name?"
+						/>
+
+						<fieldset cf-questions="Choose your favourite color, <span style='background: blue;'>blue</span>, <span style='background: red;'>red</span> or <span style='background: yellow;'>yellow</span>">
+							<input type="radio" cf-label="blue" value="blue" id="1" />
+							<input type="radio" cf-label="red" value="red" id="2" />
+							<input type="radio" cf-label="yellow" value="yellow" id="3" />
+						</fieldset>
+					</form>
+		
+				</div>
+			</section>
+
+			<section id="cf-context" role="cf-context" cf-context>
+				
+			</section>
+		</main>
+
+		<script>
+
+
+			function initExample(){
+				var dispatcher = new cf.EventDispatcher(),
+					synth = null,
+					recognition = null,
+					msg = null,
+					SpeechRecognition = null;
+				
+				try{
+					SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+				}catch(e){
+					console.log("Example support range: https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#Browser_compatibility");
+				}
+
+				// here we use https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API
+				// you can use what ever API you want, ex.: Google Cloud Speech API -> https://cloud.google.com/speech/
+
+				if(SpeechRecognition){
+					// here we create our input
+					var microphoneInput = {
+						// behaviors needs to follow the cf.IUserInput interface, they will be checked
+						init: function() {
+							console.log("voice: init method called from mic integration");
+						},
+						// set awaiting callback to false, as we will NOT await the speak in this example
+						awaitingCallback: false,
+						cancelInput: function() {
+							console.log("voice: CANCEL")
+							finalTranscript = null;
+							if(recognition){
+								recognition.onend = null;
+								recognition.onerror = null;
+								recognition.stop();
+							}
+						},
+						input: function(resolve, reject, mediaStream) {
+							console.log("voice: INPUT")
+							// input is called when user is interacting with the CF input button (UserVoiceInput)
+
+							// connect to Speech API (ex. Google Cloud Speech), Watson (https://github.com/watson-developer-cloud/speech-javascript-sdk) or use Web Speech API (like below), resolve with the text returned..
+							// using Promise pattern -> https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Promise
+								// if API fails use reject(result.toString())
+								// if API succedes use resolve(result.toString())
+							
+							if(recognition)
+								recognition.stop();
+
+							recognition = new SpeechRecognition(),
+								finalTranscript = '';
+
+							recognition.continuous = false; // react only on single input
+							recognition.interimResults = false; // we don't care about interim, only final.
+							
+							// recognition.onstart = function() {}
+							recognition.onresult = function(event) {
+								// var interimTranscript = "";
+								for (var i = event.resultIndex; i < event.results.length; ++i) {
+									if (event.results[i].isFinal) {
+										finalTranscript += event.results[i][0].transcript;
+									}
+								}
+							}
+
+							recognition.onerror = function(event) {
+								reject(event.error);
+							}
+
+							recognition.onend = function(event) {
+								if(finalTranscript && finalTranscript !== ""){
+									resolve(finalTranscript);
+								}
+							}
+
+							recognition.start();
+						}
+					}
+				}
+
+				var conversationalForm = window.cf.ConversationalForm.startTheConversation({
+					formEl: document.getElementById("form"),
+					robotImage:
+							"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpFNTE3OEEyRTk5QTAxMUUyOUExNUJDMTA0NkE4OTA0RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpFNTE3OEEyRjk5QTAxMUUyOUExNUJDMTA0NkE4OTA0RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkU1MTc4QTJDOTlBMDExRTI5QTE1QkMxMDQ2QTg5MDREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkU1MTc4QTJEOTlBMDExRTI5QTE1QkMxMDQ2QTg5MDREIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+FYrpWAAABrNJREFUeNrkW2ls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",
+
+					eventDispatcher: dispatcher,
+
+					// add the custom input (microphone)
+					microphoneInput: microphoneInput,
+
+					submitCallback: function(){
+						// remove Conversational Form
+						console.log("voice: Form submitted...", conversationalForm.getFormData(true));
+						alert("You made it! Check console for data")
+					}
+				});
+
+				if(!SpeechRecognition){
+					conversationalForm.addRobotChatResponse("SpeechRecognition not supported, so <strong>no</strong> Microphone here.");
+				}
+			};
+		</script>
+
+		<script src="build/conversational-form-examples.min.js" id="examples-script"></script>
+	</body>
+</html>
