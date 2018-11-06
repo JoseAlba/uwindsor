@@ -29,7 +29,7 @@
 
 <main class="cd-main-content" style="position:fixed;">
 
-    <iframe name="body" src="./main" frameborder=0 style="  padding: 0;
+    <iframe name="body" src="./main/index.html" frameborder=0 style="  padding: 0;
                   margin: 0;
                   border: none;
 
@@ -37,9 +37,8 @@
                   width: 100vw;
                   height: 100vh;
                   float: left;
-                  &::-webkit-scrollbar {
-                    display: none;
-                  }" id="body"></iframe>
+                  "
+                id="body"></iframe>
 </main> <!-- cd-main-content -->
 
 <nav id="cd-lateral-nav">
@@ -67,10 +66,10 @@
     </ul> <!-- cd-navigation -->
 
     <ul class="cd-navigation cd-single-item-wrapper">
-        <li><a href="#0" onclick="switchFrame('main')">Main</a></li>
+        <li><a href="#0" onclick="switchFrame('main/index.html')">Main</a></li>
         <li><a href="#0" onclick="switchFrame('book')">Books</a></li>
-        <li><a href="#0" onclick="switchFrame('coop')">Co-op</a></li>
-        <li><a href="#0" onclick="switchFrame('exchange')">Exchange</a></li>
+        <li><a href="#0" onclick="switchFrame('coop/index.php')">Co-op</a></li>
+        <li><a href="#0" onclick="switchFrame('exchange/index.html')">Exchange</a></li>
         <li><a href="#0" onclick="switchFrame('links')">Useful Links</a></li>
         <li><a href="#0" onclick="switchFrame('POTW')">POTW</a></li>
     </ul> <!-- cd-single-item-wrapper -->

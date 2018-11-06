@@ -1,42 +1,33 @@
 <?php
 	require_once('../php/common.php');
 		
-	getCurrentYear();
+	// getCurrentYear();
 
 
     // header('Content-Type: text/html');
 
     html5_header(
-        "Windsor | Main",
-        array(
-            'css/style.css', 'css/reset.css', 'http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700',
-        )
-    );
-
-    html5_js(
-        array('js/modernizr.js')
-    );
+		'Windsor | Main',
+		
+		array(
+			"	
+			<link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
+			"
+		),
+		
+		array(
+            'css/style.css', 'css/reset.css'
+		),
+		
+		array(
+			'js/modernizr.js'
+		)
+		
+	);
 ?>
 
 
-<!doctype html>
-<html lang="en" class="no-js">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
-
-    <link rel="stylesheet" href="css/reset.css"> <!-- CSS reset -->
-    <link rel="stylesheet" href="css/style.css"> <!-- Resource style -->
-    <script src="js/modernizr.js"></script> <!-- Modernizr -->
-
-    <title>Windsor | Coop</title>
-</head>
 <body>
-
-
-
 <section class="cd-intro">
     <h1 class="cd-headline rotate-1">
         <span>My favourite food is</span>
